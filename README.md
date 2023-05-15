@@ -12,4 +12,6 @@ There is a separate page where you can view and download these files according 
 - **Laravel UI**
 - **Vehikl**
 
-
+### Login credentials
+- **Email : nouran.ssp@gmail.com**
+- **Password: 12345678**
