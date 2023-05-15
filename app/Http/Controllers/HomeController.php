@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttachmentsRequest;
 use App\Models\Attachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -33,7 +34,7 @@ class HomeController extends Controller
         return view('home');
     }
 
-    public function store(Request $request)
+    public function store(AttachmentsRequest $request)
     {
 
         $file = time() . '.' . $request->file_name->extension();
