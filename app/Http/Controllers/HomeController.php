@@ -40,43 +40,81 @@ class HomeController extends Controller
         $file = time() . '.' . $request->file_name->extension();
 
         $rowscount = Attachment::where('type', $request->type)->count();
+        
+        switch ($rowscount) {
+            case 0:
+                Attachment::create([
+                    'title' => $request->title,
+                    'file_name' => $file,
+                    'type' => $request->type,
+                    'status' => "new"
+                ]);
+                break;
+            case 1:
+                $row1 = Attachment::where('status', 'new')->where('type', $request->type)->first();
+                $row1->update([
+                    'status' => "old"
+                ]);
+                Attachment::create([
+                    'title' => $request->title,
+                    'file_name' => $file,
+                    'type' => $request->type,
+                    'status' => "new"
+                ]);
+                break;
+            default:
+                $seletedrow = Attachment::where('status', 'old')->where('type', $request->type)->first();
+                $deletedfile = $seletedrow->file_name;
+                File::delete(public_path('Attachments/' . $deletedfile));
+                $seletedrow->delete();
+                $row2 = Attachment::where('status', 'new')->where('type', $request->type)->first();
+                $row2->update([
+                    'status' => "old"
+                ]);
 
-        if ($rowscount == 0) {
-            Attachment::create([
-                'title' => $request->title,
-                'file_name' => $file,
-                'type' => $request->type,
-                'status' => "new"
-            ]);
-
-        } else if ($rowscount == 1) {
-            $row1 = Attachment::where('status', 'new')->where('type', $request->type)->first();
-            $row1->update([
-                'status' => "old"
-            ]);
-            Attachment::create([
-                'title' => $request->title,
-                'file_name' => $file,
-                'type' => $request->type,
-                'status' => "new"
-            ]);
-        } else {
-            $seletedrow = Attachment::where('status', 'old')->where('type', $request->type)->first();
-            $deletedfile = $seletedrow->file_name;
-            File::delete(public_path('Attachments/' . $deletedfile));
-            $seletedrow->delete();
-            $row2 = Attachment::where('status', 'new')->where('type', $request->type)->first();
-            $row2->update([
-                'status' => "old"
-            ]);
-
-            Attachment::create([
-                'title' => $request->title,
-                'file_name' => $file,
-                'type' => $request->type,
-                'status' => "new"
-            ]);
+                Attachment::create([
+                    'title' => $request->title,
+                    'file_name' => $file,
+                    'type' => $request->type,
+                    'status' => "new"
+                ]);
         }
+//         if ($rowscount == 0) {
+//             Attachment::create([
+//                 'title' => $request->title,
+//                 'file_name' => $file,
+//                 'type' => $request->type,
+//                 'status' => "new"
+//             ]);
+
+//         } else if ($rowscount == 1) {
+//             $row1 = Attachment::where('status', 'new')->where('type', $request->type)->first();
+//             $row1->update([
+//                 'status' => "old"
+//             ]);
+//             Attachment::create([
+//                 'title' => $request->title,
+//                 'file_name' => $file,
+//                 'type' => $request->type,
+//                 'status' => "new"
+//             ]);
+//         } else {
+//             $seletedrow = Attachment::where('status', 'old')->where('type', $request->type)->first();
+//             $deletedfile = $seletedrow->file_name;
+//             File::delete(public_path('Attachments/' . $deletedfile));
+//             $seletedrow->delete();
+//             $row2 = Attachment::where('status', 'new')->where('type', $request->type)->first();
+//             $row2->update([
+//                 'status' => "old"
+//             ]);
+
+//             Attachment::create([
+//                 'title' => $request->title,
+//                 'file_name' => $file,
+//                 'type' => $request->type,
+//                 'status' => "new"
+//             ]);
+//         }
 
         $request->file_name->move(public_path('Attachments/'), $file);
         session()->flash('update', 'successfuly updated');
